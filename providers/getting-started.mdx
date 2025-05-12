@@ -1,0 +1,139 @@
+---
+title: 'Getting Started for Providers'
+description: 'Begin offering AI models through Routstr'
+---
+
+# Getting Started as a Provider
+
+This guide will help you set up as a model provider on Routstr. By offering your AI models through the Routstr network, you can reach users worldwide and receive micropayments without complex payment infrastructure.
+
+## What You Can Offer
+
+As a provider, you can offer:
+
+- Access to any OpenAI-compatible API endpoint
+- Open-source models you're hosting (Llama, Mistral, etc.)
+- Proprietary models with custom pricing
+- Specialized models with unique capabilities
+
+## Benefits for Providers
+
+Joining Routstr as a provider gives you:
+
+- **Instant Monetization**: Receive Lightning or Cashu micropayments without setting up complex payment infrastructure
+- **Global Reach**: Connect with users worldwide through the decentralized marketplace
+- **Zero Overhead**: No need for user management, subscriptions, or billing systems
+- **Full Control**: Set your own pricing, capacity limits, and access policies
+
+## Setting Up Your Provider Node
+
+### Prerequisites
+
+- An OpenAI-compatible API endpoint (e.g., your locally hosted model, a proxied commercial model, etc.)
+- Docker (recommended) or a Linux server
+- A Lightning address or Cashu mint to receive payments
+
+### Quick Setup with Docker
+
+The simplest way to set up a Routstr provider is using the official Docker image:
+
+```bash
+docker run -p 8080:8080 ghcr.io/routstr/proxy
+```
+
+This will start a proxy server that can accept Cashu token payments and forward requests to your OpenAI-compatible API endpoint.
+
+### Configuration
+
+The proxy requires configuration to connect to your model endpoint and set up payments. You can create a `.env` file with the following settings:
+
+```bash
+# API endpoint settings
+OPENAI_API_KEY=your_model_api_key
+MODEL_ENDPOINT_URL=http://your-model-endpoint:8000/v1
+
+# Payment settings
+CASHU_MINT_URL=https://your-cashu-mint.com
+LIGHTNING_ADDRESS=your@lightning.address
+```
+
+Then run the Docker container with your configuration:
+
+```bash
+docker run -p 8080:8080 \
+  --env-file .env \
+  ghcr.io/routstr/proxy
+```
+
+### Manual Setup
+
+If you prefer to set up the provider manually:
+
+1. Clone the Routstr proxy repository:
+   ```bash
+   git clone https://github.com/Routstr/proxy.git
+   cd proxy
+   ```
+
+2. Create a `.env` file with your configuration (see example above)
+
+3. Start the proxy using docker-compose:
+   ```bash
+   docker-compose up
+   ```
+
+## Configuring Your Models
+
+You can customize the pricing and configuration for your models by editing the `models.json` file:
+
+```json
+[
+  {
+    "id": "gpt-4",
+    "pricing": {
+      "prompt": 0.03,
+      "completion": 0.06
+    }
+  },
+  {
+    "id": "llama-3-70b-chat",
+    "pricing": {
+      "prompt": 0.0007,
+      "completion": 0.0014
+    }
+  }
+]
+```
+
+This configuration specifies the pricing per 1K tokens for input (prompt) and output (completion).
+
+## Monitoring Your Provider
+
+You can monitor your provider using the built-in dashboard:
+
+```bash
+# Access the dashboard
+open http://localhost:8080/admin
+```
+
+The dashboard provides information about:
+
+- Request volume and traffic
+- Revenue generated
+- Model usage statistics
+- Payment status
+
+## Announcing Your Provider
+
+After your provider is running, you can announce it to the Routstr network via Nostr:
+
+1. Configure your provider with your Nostr private key or npub
+2. Enable automatic announcements in the configuration
+3. Set a custom name and description for your provider
+
+## Next Steps
+
+- [Provider Configuration Reference](/providers/configuration)
+- [Hosting Models](/providers/hosting-models)
+- [Payment Integration](/providers/payment-integration)
+- [Advanced Provider Features](/providers/advanced-features) 

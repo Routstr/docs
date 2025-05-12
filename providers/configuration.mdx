@@ -1,0 +1,295 @@
+---
+title: 'Provider Configuration Reference'
+description: 'Complete reference for Routstr provider configuration options'
+---
+
+# Provider Configuration Reference
+
+This document provides a comprehensive reference for all configuration options available when setting up a Routstr provider node.
+
+## Configuration File Structure
+
+The configuration file (`config.json`) has the following main sections:
+
+```json
+{
+  "provider": { /* Provider settings */ },
+  "payment": { /* Payment processing settings */ },
+  "routing": { /* Network and routing settings */ },
+  "access": { /* Access control settings */ },
+  "server": { /* Server configuration */ },
+  "logging": { /* Logging settings */ }
+}
+```
+
+## Provider Settings
+
+The `provider` section defines your service information and models:
+
+```json
+"provider": {
+  "name": "Your Provider Name",
+  "description": "Description of your service",
+  "website": "https://your-website.com",
+  "contact": "your@email.com",
+  "endpoint": "http://localhost:11434/v1",
+  "apiKey": "your-local-api-key", // If your endpoint requires authentication
+  "models": [
+    /* Model configuration objects */
+  ]
+}
+```
+
+### Model Configuration
+
+Each model under the `models` array has the following options:
+
+```json
+{
+  "id": "local-model-id",
+  "name": "your-namespace/model-name", // How it appears in the marketplace
+  "description": "Description of your model's capabilities",
+  "capabilities": ["text", "code", "vision", "audio", "embeddings"],
+  "compatible": ["gpt-3.5-turbo", "gpt-4"], // Compatible API formats
+  "contextWindow": 32768, // Maximum context length in tokens
+  "maxOutputTokens": 4096, // Maximum generation length
+  "training": {
+    "dataset": "General web content, books, code",
+    "cutoff": "June 2023" // Training data cutoff
+  },
+  "pricing": {
+    "prompt": 0.5, // sats per 1K tokens
+    "completion": 1.0, // sats per 1K tokens
+    "image": 5.0, // sats per image
+    "audio": 10.0, // sats per minute of audio
+    "embedding": 0.2 // sats per 1K tokens
+  },
+  "rateLimit": {
+    "requests": 100, // requests per minute
+    "tokens": 50000, // tokens per minute
+    "concurrency": 5 // maximum concurrent requests
+  },
+  "performance": {
+    "latency": 200, // Typical latency in ms per token
+    "throughput": 30 // Typical tokens per second
+  }
+}
+```
+
+## Payment Settings
+
+The `payment` section configures how your provider accepts payments:
+
+```json
+"payment": {
+  "lightning": {
+    "enabled": true,
+    "address": "your@lightning.address",
+    "minAmount": 10, // minimum payment in sats
+    "provider": "lnbits", // or "lnd", "cln", "lnurl"
+    "lnbitsUrl": "https://your-lnbits-instance.com",
+    "apiKey": "your-lnbits-api-key",
+    "webhookUrl": "https://your-webhook-endpoint.com", // For payment notifications
+    "invoiceExpiry": 300 // Invoice expiry in seconds
+  },
+  "cashu": {
+    "enabled": true,
+    "mint": "https://your-cashu-mint.com",
+    "customMint": true, // Accept tokens only from your mint
+    "minAmount": 5 // minimum token value in sats
+  },
+  "prepaid": {
+    "enabled": true,
+    "apiKeys": {
+      "key1": {
+        "balance": 10000, // sats
+        "expiryDate": "2025-12-31"
+      }
+    }
+  }
+}
+```
+
+## Routing Settings
+
+The `routing` section configures how your provider is announced to the network:
+
+```json
+"routing": {
+  "announcePublicly": true, // list on public directory
+  "nostr": {
+    "enabled": true,
+    "privateKey": "nsec1...", // Optional, will generate if not provided
+    "relays": [
+      "wss://relay.nostr.band",
+      "wss://relay.damus.io",
+      "wss://nos.lol"
+    ],
+    "announcementInterval": 3600 // seconds between announcements
+  },
+  "dns": {
+    "enabled": false,
+    "domain": "your-provider.example.com",
+    "tlsEnabled": true,
+    "certPath": "/path/to/cert",
+    "keyPath": "/path/to/key"
+  }
+}
+```
+
+## Access Control Settings
+
+The `access` section configures who can use your service:
+
+```json
+"access": {
+  "public": true, // true for public access
+  "allowedKeys": ["npub1...", "npub2..."], // nostr public keys
+  "inviteCodes": ["invite1", "invite2"], // invite codes
+  "ipWhitelist": ["192.168.1.1", "10.0.0.0/24"],
+  "ipBlacklist": ["1.2.3.4"],
+  "geoRestrictions": {
+    "allowedCountries": ["US", "CA", "EU"], // ISO country codes
+    "blockedCountries": [] // ISO country codes
+  },
+  "rateLimit": {
+    "enabled": true,
+    "requestsPerMinute": 30,
+    "tokensPerDay": 1000000,
+    "uniqueIPs": 1000
+  }
+}
+```
+
+## Server Configuration
+
+The `server` section configures the provider server:
+
+```json
+"server": {
+  "host": "0.0.0.0",
+  "port": 3000,
+  "metricsPort": 9090, // For Prometheus metrics
+  "proxy": {
+    "enabled": false,
+    "url": "socks5://127.0.0.1:9050" // For outbound connections
+  },
+  "cors": {
+    "enabled": true,
+    "origins": ["*"]
+  },
+  "tls": {
+    "enabled": false,
+    "certPath": "/path/to/cert",
+    "keyPath": "/path/to/key"
+  }
+}
+```
+
+## Logging Configuration
+
+The `logging` section configures how logs are handled:
+
+```json
+"logging": {
+  "level": "info", // debug, info, warn, error
+  "file": "/var/log/routstr-provider.log",
+  "rotateSize": "10M",
+  "keepLogs": 5,
+  "pretty": false, // true for human-readable logs
+  "metrics": {
+    "enabled": true,
+    "prometheus": true
+  }
+}
+```
+
+## Environment Variables
+
+You can override configuration settings using environment variables:
+
+```
+ROUTSTR_PROVIDER_NAME=MyProvider
+ROUTSTR_PROVIDER_ENDPOINT=http://localhost:11434/v1
+ROUTSTR_PAYMENT_LIGHTNING_ADDRESS=your@lightning.address
+ROUTSTR_SERVER_PORT=3000
+```
+
+## Complete Example
+
+Here's a complete example of a provider configuration file:
+
+```json
+{
+  "provider": {
+    "name": "FastAI Provider",
+    "description": "High-performance AI models with low latency",
+    "website": "https://fastai-provider.com",
+    "contact": "support@fastai-provider.com",
+    "endpoint": "http://localhost:11434/v1",
+    "models": [
+      {
+        "id": "mistral-7b-instruct",
+        "name": "fastai/mistral-7b-instruct",
+        "description": "Efficient Mistral 7B model optimized for instruction following",
+        "capabilities": ["text", "code"],
+        "compatible": ["gpt-3.5-turbo"],
+        "contextWindow": 8192,
+        "maxOutputTokens": 2048,
+        "pricing": {
+          "prompt": 0.2,
+          "completion": 0.4
+        }
+      },
+      {
+        "id": "llama-3-70b",
+        "name": "fastai/llama-3-70b",
+        "description": "High-performance Llama 3 70B model with advanced reasoning",
+        "capabilities": ["text", "code", "reasoning"],
+        "compatible": ["gpt-4"],
+        "contextWindow": 32768,
+        "pricing": {
+          "prompt": 0.8,
+          "completion": 1.6
+        }
+      }
+    ]
+  },
+  "payment": {
+    "lightning": {
+      "enabled": true,
+      "address": "support@fastai-provider.com",
+      "minAmount": 10
+    },
+    "cashu": {
+      "enabled": true
+    }
+  },
+  "routing": {
+    "announcePublicly": true,
+    "nostr": {
+      "enabled": true,
+      "relays": [
+        "wss://relay.nostr.band",
+        "wss://relay.damus.io"
+      ]
+    }
+  },
+  "server": {
+    "port": 3000,
+    "cors": {
+      "enabled": true,
+      "origins": ["*"]
+    }
+  },
+  "logging": {
+    "level": "info"
+  }
+}
+```
+
+## Next Steps
+
+- [Hosting Models](/providers/hosting-models)
+- [Payment Integration](/providers/payment-integration)
+- [Advanced Provider Features](/providers/advanced-features) 

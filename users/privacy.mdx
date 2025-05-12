@@ -1,0 +1,118 @@
+---
+title: 'Privacy Features'
+description: 'How Routstr protects your privacy when using AI models'
+---
+
+# Privacy Features
+
+Routstr is designed with privacy as a core principle. This guide explains the privacy features built into the platform and how to use them effectively.
+
+## Privacy-First Architecture
+
+Routstr's architecture is designed to minimize data collection and maximize user control:
+
+1. **No User Accounts**: No email, phone number, or personal information required
+2. **No Request Logging**: Your prompts and completions are not stored by Routstr
+3. **Decentralized Network**: No central authority controls the entire system
+4. **Private Payments**: Use Lightning Network or Cashu tokens for anonymous payments
+
+## Privacy-Enhancing Technologies
+
+### Tor Integration
+
+Routstr includes built-in support for routing requests through the Tor network:
+
+```bash
+# Add Tor routing to your API requests
+curl --socks5-hostname 127.0.0.1:9050 -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Hello"
+      }
+    ]
+  }'
+```
+
+This prevents providers from seeing your real IP address and adds an additional layer of network privacy.
+
+### SOCKS5 Proxy Support
+
+For more flexibility, you can use any SOCKS5 proxy:
+
+```bash
+# Using a custom SOCKS5 proxy
+curl --socks5-hostname your-proxy-server:1080 -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Hello"
+      }
+    ]
+  }'
+```
+
+## Anonymous Payments
+
+### Cashu Token Payments
+
+[Cashu](https://cashu.space) is an anonymous ecash system that provides complete payment privacy:
+
+1. Buy Cashu tokens using Lightning Network
+2. No personal information is required for purchase
+3. Tokens are bearer instruments - whoever has the token can use it
+4. Spend tokens directly for API access without revealing identity
+
+### Lightning Network Privacy
+
+When using Lightning Network payments, you can enhance privacy by:
+
+1. Using a privacy-focused Lightning wallet
+2. Generating new payment codes for each transaction
+3. Using a Lightning Address from a privacy-focused provider
+
+## Best Practices for Privacy
+
+1. **Use Tor or a trusted VPN/proxy** for all Routstr connections
+2. **Pay with Cashu tokens** for maximum payment privacy
+3. **Avoid including personal information** in prompts
+4. **Use privacy-focused providers** when available
+5. **Regularly rotate payment information** for improved privacy
+
+## Self-Hosting for Maximum Privacy
+
+For maximum privacy, you can:
+
+1. **Self-host a Routstr proxy**: Run your own proxy to avoid third-party access
+2. **Connect to trusted providers**: Choose providers with strong privacy policies
+3. **Use your own Lightning node**: Process payments through your own node
+
+```bash
+# Run your own Routstr proxy
+docker run -p 8080:8080 \
+  -v /path/to/config.json:/app/config.json \
+  ghcr.io/routstr/proxy
+```
+
+## Technical Privacy Protections
+
+Routstr implements several technical privacy protections:
+
+1. **End-to-end TLS**: All API connections use TLS encryption
+2. **Token-based authentication**: No persistent user identifiers
+3. **Minimal metadata**: Limited metadata collection in requests
+4. **Circuit-breaking**: Prevent provider identity correlation
+
+## Next Steps
+
+- [API Reference](/api-reference/introduction)
+- [Advanced Privacy Techniques](/users/advanced-privacy)
+- [Self-Hosting Guide](/providers/self-hosting) 

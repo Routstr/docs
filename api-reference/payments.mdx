@@ -1,0 +1,139 @@
+---
+title: 'Wallet API'
+description: 'API endpoints for managing your Routstr wallet and payments'
+---
+
+# Wallet API
+
+The Wallet API allows you to manage your Routstr wallet, check your balance, add funds, and withdraw your remaining balance.
+
+## Base URL
+
+```
+https://api.routstr.com/v1/wallet
+```
+
+## Authentication
+
+All wallet endpoints require authentication with your Cashu token. Include it in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_CASHU_TOKEN
+```
+
+## Endpoints
+
+### Get Account Information
+
+```http
+GET /v1/wallet/
+```
+
+Retrieve information about your account, including your current balance.
+
+#### Request Headers
+
+| Header | Description |
+|--------|-------------|
+| `Authorization` | Bearer YOUR_CASHU_TOKEN |
+
+#### Example Request
+
+```bash
+curl -X GET https://api.routstr.com/v1/wallet/ \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN"
+```
+
+#### Example Response
+
+```json
+{
+  "balance": 0.00045,
+  "user_id": "user_123abc",
+  "created_at": "2023-05-12T15:30:00Z",
+  "stats": {
+    "total_requests": 15,
+    "total_tokens": 1250
+  }
+}
+```
+
+### Add Funds to Your Wallet
+
+```http
+POST /v1/wallet/topup
+```
+
+Add funds to your wallet using another Cashu token.
+
+#### Request Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `cashu_token` | string | The Cashu token containing funds to add to your wallet |
+
+#### Request Headers
+
+| Header | Description |
+|--------|-------------|
+| `Authorization` | Bearer YOUR_CASHU_TOKEN |
+
+#### Example Request
+
+```bash
+curl -X POST "https://api.routstr.com/v1/wallet/topup?cashu_token=cashuA1DkpNewToken..." \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN"
+```
+
+#### Example Response
+
+```json
+{
+  "previous_balance": 0.00045,
+  "added_amount": 0.0010,
+  "new_balance": 0.00145,
+  "status": "success"
+}
+```
+
+### Withdraw Your Balance
+
+```http
+POST /v1/wallet/refund
+```
+
+Withdraw your remaining balance as a Cashu token.
+
+#### Request Headers
+
+| Header | Description |
+|--------|-------------|
+| `Authorization` | Bearer YOUR_CASHU_TOKEN |
+
+#### Example Request
+
+```bash
+curl -X POST https://api.routstr.com/v1/wallet/refund \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN"
+```
+
+#### Example Response
+
+```json
+{
+  "previous_balance": 0.00145,
+  "withdrawn_amount": 0.00145,
+  "new_balance": 0,
+  "cashu_token": "cashuA1DkpRefundToken...",
+  "status": "success"
+}
+```
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - Invalid Cashu token |
+| 402 | Payment Required - Insufficient funds |
+| 400 | Bad Request - Invalid request parameters |
+| 500 | Server Error - Something went wrong | 

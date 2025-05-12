@@ -1,0 +1,384 @@
+---
+title: "Advanced API Usage"
+description: "Unlock the full power of the Routstr API"
+---
+
+# Advanced API Usage
+
+This guide covers more sophisticated features of the Routstr API to help you get the most out of the platform.
+
+## Streaming Responses
+
+For improved user experience, you can stream responses as they're generated rather than waiting for the complete response:
+
+```javascript
+// Using fetch with streaming
+async function streamCompletion() {
+  const response = await fetch('https://api.routstr.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer cashuA1DkpMbgQ9VkL6U...'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'user', content: 'Write a story about a space adventurer' }
+      ],
+      stream: true  // Enable streaming
+    })
+  });
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    // Process each chunk
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n').filter(line => line.trim() !== '');
+    
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6);
+        if (data === '[DONE]') continue;
+        
+        try {
+          const parsed = JSON.parse(data);
+          const content = parsed.choices[0]?.delta?.content || '';
+          if (content) {
+            // Process streamed content
+            console.log(content);
+          }
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      }
+    }
+  }
+}
+```
+
+Using the OpenAI client library in Python:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "Tell me a story about a space adventurer"}
+    ],
+    stream=True
+)
+
+# Process the stream
+for chunk in response:
+    content = chunk.choices[0].delta.content
+    if content:
+        # Process streamed content
+        print(content, end='', flush=True)
+```
+
+## Working with Images
+
+You can include images in your prompts for vision-capable models:
+
+```python
+from openai import OpenAI
+import base64
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+# Function to encode image
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get base64 string
+base64_image = encode_image("path/to/image.jpg")
+
+response = client.chat.completions.create(
+    model="gpt-4-vision",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "What's in this image?"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    max_tokens=300
+)
+
+print(response.choices[0].message.content)
+```
+
+## Function Calling
+
+You can define functions that the model can call during its generation:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+# Define the function schema
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a location",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city and state, e.g. San Francisco, CA"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "Temperature unit"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "What's the weather like in New York?"}
+    ],
+    tools=tools,
+    tool_choice="auto"
+)
+
+message = response.choices[0].message
+tool_calls = message.tool_calls
+
+if tool_calls:
+    # Process the tool call
+    function_name = tool_calls[0].function.name
+    function_args = json.loads(tool_calls[0].function.arguments)
+    
+    # Here you would call your actual weather API
+    # For this example, we'll just create a mock response
+    weather_info = {
+        "temperature": 72,
+        "unit": function_args.get("unit", "fahrenheit"),
+        "condition": "sunny",
+        "location": function_args["location"]
+    }
+    
+    # Send the function result back to the model
+    messages = [
+        {"role": "user", "content": "What's the weather like in New York?"},
+        message,
+        {
+            "role": "tool",
+            "tool_call_id": tool_calls[0].id,
+            "name": function_name,
+            "content": json.dumps(weather_info)
+        }
+    ]
+    
+    second_response = client.chat.completions.create(
+        model="gpt-4",
+        messages=messages
+    )
+    
+    print(second_response.choices[0].message.content)
+```
+
+## Error Handling
+
+Implement robust error handling for API requests:
+
+```python
+import openai
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+try:
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "user", "content": "Analyze this complex problem..."}
+        ]
+    )
+    # Process successful response
+    print(response.choices[0].message.content)
+    
+except openai.RateLimitError:
+    # Handle rate limiting
+    print("Rate limit exceeded. Please try again later.")
+    
+except openai.APIConnectionError:
+    # Handle connection issues
+    print("Unable to connect to the API. Please check your internet connection.")
+    
+except openai.AuthenticationError:
+    # Handle authentication issues
+    print("Authentication error. Please check your token.")
+    
+except openai.APIError as e:
+    # Handle API errors
+    print(f"API error: {e}")
+```
+
+## JSON Mode
+
+Request structured JSON responses:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "Give me information about Paris, France including population, famous landmarks, and local cuisine"}
+    ],
+    response_format={"type": "json_object"}
+)
+
+# The response will be structured as JSON
+paris_info = response.choices[0].message.content
+print(paris_info)
+```
+
+## System Messages
+
+Use system messages to set the tone and behavior of the model:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a helpful expert in quantum physics. Explain concepts clearly using analogies that a high school student would understand."},
+        {"role": "user", "content": "Explain quantum entanglement"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+## Multi-turn Conversations
+
+Maintain context across multiple exchanges:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+# Initial request
+messages = [
+    {"role": "system", "content": "You are a helpful AI assistant."},
+    {"role": "user", "content": "Hello, who are you?"}
+]
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=messages
+)
+
+# Add assistant response to messages
+messages.append({
+    "role": "assistant",
+    "content": response.choices[0].message.content
+})
+
+# Add next user message
+messages.append({
+    "role": "user", 
+    "content": "Can you tell me about machine learning?"
+})
+
+# Continue the conversation
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=messages
+)
+
+print(response.choices[0].message.content)
+```
+
+## Privacy-Enhanced Requests
+
+Combine the Routstr API with privacy features:
+
+```python
+import requests
+import socks
+import socket
+
+# Configure SOCKS for Tor
+socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 9050)
+socket.socket = socks.socksocket
+
+# Make the request through Tor
+response = requests.post(
+    "https://api.routstr.com/v1/chat/completions",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer cashuA1DkpMbgQ9VkL6U..."
+    },
+    json={
+        "model": "gpt-4",
+        "messages": [
+            {"role": "user", "content": "What is my IP address?"}
+        ]
+    }
+)
+
+print(response.json())
+```
+
+## Next Steps
+
+- [API Reference](/api-reference/introduction)
+- [Privacy Features](/users/privacy)
+- [Building Applications with Routstr](/users/applications) 

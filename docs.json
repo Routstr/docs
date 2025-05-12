@@ -1,36 +1,60 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Routstr Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#FF9500",
+    "light": "#FFA726",
+    "dark": "#F57C00"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Overview",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": ["index", "quickstart", "development"]
+          }
+        ]
+      },
+      {
+        "tab": "Users",
         "groups": [
           {
             "group": "Get Started",
+            "pages": ["users/getting-started"]
+          },
+          {
+            "group": "Guides",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "users/advanced-sdk",
+              "users/model-selection",
+              "users/privacy",
+              "users/applications"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Providers",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["providers/getting-started"]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "providers/hosting-models",
+              "providers/payment-integration",
+              "providers/advanced-features"
             ]
           },
           {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
+            "group": "Reference",
+            "pages": ["providers/configuration"]
           }
         ]
       },
@@ -39,17 +63,15 @@
         "groups": [
           {
             "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Endpoints",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/models",
+              "api-reference/completions",
+              "api-reference/payments",
+              "api-reference/providers"
             ]
           }
         ]
@@ -58,45 +80,35 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "GitHub",
+          "href": "https://github.com/routstr/routstr",
+          "icon": "github"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/routstr.svg",
+    "dark": "/logo/routstr.svg",
+    "href": "https://www.routstr.com"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:contact@routstr.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Launch App",
+      "href": "https://www.routstr.com"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/routstr",
+      "github": "https://github.com/routstr"
     }
   }
 }

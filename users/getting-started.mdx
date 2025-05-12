@@ -1,0 +1,154 @@
+---
+title: 'Getting Started'
+description: 'Start using Routstr as a model consumer'
+---
+
+# Getting Started with Routstr
+
+Welcome to Routstr! This guide will help you get started using the Routstr platform to access AI models from various providers through our OpenAI-compatible API.
+
+## What is Routstr?
+
+Routstr is a decentralized marketplace for AI model inference. It connects you to a network of model providers who host and serve various AI models. Key benefits include:
+
+- **Access to diverse models**: Find the right model for your specific use case
+- **Pay-as-you-go pricing**: Only pay for what you use with Cashu tokens or Lightning payments
+- **No accounts needed**: No signup or registration required
+- **Privacy-focused**: Your data stays secure with options like Tor routing
+
+## Purchasing Cashu Tokens
+
+To use the Routstr API, you'll need to purchase Cashu tokens:
+
+1. Visit [Routstr.com](https://www.routstr.com/tokens)
+2. Make a Lightning payment to receive your Cashu token
+3. Use the token as your API key for authorization
+
+No account creation or personal information is required.
+
+## Making Your First API Request
+
+You can start making requests to the Routstr API using standard HTTP requests. The API is compatible with the OpenAI API format:
+
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Hello"
+      }
+    ]
+  }'
+```
+
+The response will include the model's output:
+
+```json
+{
+  "id": "chatcmpl-123abc",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "gpt-4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Hello! How can I assist you today?"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 3,
+    "completion_tokens": 7,
+    "total_tokens": 10
+  }
+}
+```
+
+## Using Different Models
+
+You can specify different models in your requests:
+
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "llama-3-70b-chat",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "What is the capital of France?"
+      }
+    ]
+  }'
+```
+
+If you don't specify a model, Routstr will automatically select an appropriate model based on your request.
+
+## Managing Costs
+
+Routstr offers a transparent pay-as-you-go pricing model:
+
+1. **Pay per token**: Different models have different pricing per input/output token
+2. **No subscription required**: Only pay for what you use
+3. **Token balance**: Your Cashu token contains pre-paid credits
+4. **Usage tracking**: The API response includes token usage information
+
+## Privacy Features
+
+If privacy is important to you, Routstr offers several options:
+
+```bash
+# Route through Tor
+curl --socks5-hostname 127.0.0.1:9050 -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Hello"
+      }
+    ]
+  }'
+```
+
+See our [Privacy Features](/users/privacy) page for more details.
+
+## Using with OpenAI Libraries
+
+Since Routstr's API is compatible with the OpenAI format, you can use it with existing OpenAI client libraries:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+completion = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "Hello!"}
+    ]
+)
+
+print(completion.choices[0].message)
+```
+
+## Next Steps
+
+Now that you're set up, explore these resources:
+
+- [API Reference](/api-reference/introduction): Detailed API documentation
+- [Model Selection](/users/model-selection): Guide to choosing the right model
+- [Privacy Features](/users/privacy): Learn about privacy options
+- [Applications](/users/applications): Examples of what you can build 

@@ -1,0 +1,109 @@
+---
+title: 'Chat Completions API'
+description: 'API endpoints for generating chat completions'
+---
+
+# Chat Completions API
+
+The Chat Completions API allows you to generate text responses using the Routstr platform's proxy to OpenRouter.ai.
+
+## Base URL
+
+```
+https://api.routstr.com/v1/chat/completions
+```
+
+## Endpoints
+
+### Create Chat Completion
+
+```http
+POST /v1/chat/completions
+```
+
+Generate a completion for the provided messages and parameters.
+
+#### Request Body
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `model` | string | ID of the model to use (e.g., "gpt-4") |
+| `messages` | array | Array of message objects with role and content |
+| `max_tokens` | integer | Maximum number of tokens to generate |
+| `temperature` | number | Sampling temperature (0-2) |
+| `stream` | boolean | Whether to stream the response |
+
+#### Example Request
+
+```json
+{
+  "model": "gpt-4",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Hello, who are you?"
+    }
+  ],
+  "max_tokens": 150,
+  "temperature": 0.7
+}
+```
+
+#### Example Response
+
+```json
+{
+  "id": "chatcmpl-123abc",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "gpt-4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "I'm an AI assistant designed to provide helpful and informative responses. How can I help you today?"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 18,
+    "completion_tokens": 22,
+    "total_tokens": 40
+  }
+}
+```
+
+### Streaming Response
+
+To receive a streaming response, set `stream: true` in your request body:
+
+```json
+{
+  "model": "gpt-4",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a short poem about technology."
+    }
+  ],
+  "stream": true
+}
+```
+
+The API will then return a stream of server-sent events, each containing a delta of the response.
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Bad Request - Check your request parameters |
+| 401 | Unauthorized - Invalid Cashu token |
+| 402 | Payment Required - Insufficient funds |
+| 404 | Not Found - Model not found |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Server Error - Something went wrong | 

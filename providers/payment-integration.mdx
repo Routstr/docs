@@ -1,0 +1,263 @@
+---
+title: 'Payment Integration'
+description: 'Setting up payment methods for your Routstr provider'
+---
+
+# Payment Integration
+
+This guide explains how to set up and manage payment methods for your Routstr provider node, allowing you to receive micropayments for your AI inference services.
+
+## Supported Payment Methods
+
+Routstr supports the following payment methods:
+
+1. **Lightning Network**: Fast, low-fee Bitcoin payments
+2. **Cashu Tokens**: Anonymous ecash tokens
+3. **API Keys**: Prepaid credits for trusted users
+
+## Lightning Network Integration
+
+### Lightning Address Setup
+
+The simplest way to receive Lightning payments is through a Lightning address:
+
+```json
+"payment": {
+  "lightning": {
+    "enabled": true,
+    "address": "your@lightning.address",
+    "minAmount": 10  // minimum payment in sats
+  }
+}
+```
+
+You can get a Lightning address from services like:
+- [LightningTipBot](https://lightsats.com)
+- [Wallet of Satoshi](https://walletofsatoshi.com)
+- [Alby](https://getalby.com)
+- [Zebedee](https://zebedee.io)
+
+### LNbits Integration
+
+For more control, you can use LNbits to handle Lightning payments:
+
+```json
+"payment": {
+  "lightning": {
+    "enabled": true,
+    "provider": "lnbits",
+    "lnbitsUrl": "https://legend.lnbits.com",
+    "apiKey": "your-lnbits-admin-key",
+    "invoiceExpiry": 300  // seconds
+  }
+}
+```
+
+### Lightning Node Integration
+
+For advanced users, connect directly to your Lightning node:
+
+#### LND
+
+```json
+"payment": {
+  "lightning": {
+    "enabled": true,
+    "provider": "lnd",
+    "lndRestUrl": "https://your-lnd-node:8080",
+    "macaroon": "hex-encoded-admin-macaroon",
+    "tlsCert": "base64-encoded-tls-cert"  // Optional
+  }
+}
+```
+
+#### Core Lightning (CLN)
+
+```json
+"payment": {
+  "lightning": {
+    "enabled": true,
+    "provider": "cln",
+    "clnRpcPath": "/path/to/lightning-rpc",
+    "clnNodeDir": "/path/to/.lightning"
+  }
+}
+```
+
+## Cashu Integration
+
+[Cashu](https://cashu.space) is an anonymous ecash system that allows for completely private payments.
+
+### Basic Setup
+
+```json
+"payment": {
+  "cashu": {
+    "enabled": true,
+    "minAmount": 5  // minimum token value in sats
+  }
+}
+```
+
+### Custom Mint
+
+You can also run your own Cashu mint:
+
+```json
+"payment": {
+  "cashu": {
+    "enabled": true,
+    "mint": "https://your-cashu-mint.com",
+    "customMint": true,  // Only accept tokens from your mint
+    "keys": {
+      "keysets": ["mint-keyset-id"],
+      "privateKeys": {
+        "mint-keyset-id": "your-private-keys"  // Optional, for running your own mint
+      }
+    }
+  }
+}
+```
+
+## Prepaid API Keys
+
+For trusted users or organizations, you can create prepaid API keys:
+
+```json
+"payment": {
+  "prepaid": {
+    "enabled": true,
+    "apiKeys": {
+      "test-api-key": {
+        "balance": 10000,  // sats
+        "expiryDate": "2025-12-31",
+        "name": "Test User",
+        "email": "test@example.com"  // Optional
+      }
+    }
+  }
+}
+```
+
+## Payment Webhooks
+
+You can set up webhooks to be notified of payments:
+
+```json
+"payment": {
+  "webhooks": {
+    "enabled": true,
+    "url": "https://your-server.com/payment-webhook",
+    "secret": "your-webhook-secret",
+    "events": ["payment.received", "payment.failed", "token.redeemed"]
+  }
+}
+```
+
+## Payment Tracking
+
+### Viewing Payment History
+
+Monitor your payments with the provider CLI:
+
+```bash
+routstr-provider payments list
+```
+
+To view details of a specific payment:
+
+```bash
+routstr-provider payments show payment-id
+```
+
+### Payment Reports
+
+Generate payment reports for accounting:
+
+```bash
+routstr-provider payments report --from 2024-01-01 --to 2024-01-31
+```
+
+## Advanced Payment Settings
+
+### Fee Management
+
+Configure how fees are handled:
+
+```json
+"payment": {
+  "fees": {
+    "includeInPrice": true,  // Include Lightning fees in the price
+    "maxFeePercent": 1.0,    // Maximum fee as percentage of payment
+    "maxFeeAbsolute": 5      // Maximum fee in sats
+  }
+}
+```
+
+### Payment Batching
+
+For improved efficiency with small payments:
+
+```json
+"payment": {
+  "batching": {
+    "enabled": true,
+    "threshold": 1000,      // Batch payments below this amount
+    "interval": 3600,       // Seconds between batch processing
+    "minBatchSize": 10      // Minimum payments to batch
+  }
+}
+```
+
+## Multi-Currency Support
+
+While Routstr primarily uses Bitcoin (sats), you can set display currencies:
+
+```json
+"payment": {
+  "currencies": {
+    "display": ["USD", "EUR"],
+    "rates": {
+      "provider": "coingecko",
+      "cacheTime": 3600
+    }
+  }
+}
+```
+
+## Security Best Practices
+
+1. **Secure your keys**: Store Lightning and Cashu keys securely
+2. **Regular backups**: Back up payment data regularly
+3. **Monitor activity**: Set up alerts for unusual payment patterns
+4. **Implement rate limits**: Prevent payment-related DoS attacks
+5. **Use HTTPS**: Secure your payment endpoints with proper TLS
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Lightning payments not working">
+    - Check that your Lightning address/node is accessible
+    - Verify that invoices are being generated correctly
+    - Confirm that your node has inbound liquidity
+    - Check network connectivity to Lightning services
+  </Accordion>
+  <Accordion title="Cashu tokens not redeeming">
+    - Verify token integrity and validity
+    - Check that the mint is accessible
+    - Ensure token has not been double-spent
+    - Confirm token value meets minimum requirements
+  </Accordion>
+  <Accordion title="API keys not working">
+    - Check that the key exists in your configuration
+    - Verify that the key has sufficient balance
+    - Confirm that the key has not expired
+    - Check for rate limiting or access restrictions
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+- [Advanced Provider Features](/providers/advanced-features)
+- [Hosting Models](/providers/hosting-models)
+- [Provider Configuration Reference](/providers/configuration) 

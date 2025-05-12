@@ -1,0 +1,138 @@
+---
+title: 'Hosting AI Models'
+description: 'Guide to hosting AI models for use with Routstr'
+---
+
+# Hosting AI Models
+
+This guide provides information on how to host AI models for use with the Routstr proxy. As a provider, you'll need to set up a model server with an OpenAI-compatible API that your Routstr proxy can connect to.
+
+## Overview
+
+When hosting models for Routstr, you have several options:
+
+1. **Self-hosted open-source models**: Run open-source models locally using tools like Ollama, LM Studio, or vLLM
+2. **Commercial API proxying**: Proxy requests to commercial APIs like OpenAI, Anthropic, etc.
+3. **Cloud-hosted models**: Deploy models on cloud infrastructure for better scaling
+
+## Self-Hosted Open-Source Models
+
+### Ollama
+
+[Ollama](https://ollama.ai/) provides a simple way to run open-source models locally with an OpenAI-compatible API endpoint.
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull and run a model
+ollama pull llama3 
+ollama serve
+
+# The API is available at http://localhost:11434/v1
+```
+
+Configure the Routstr proxy to connect to Ollama by setting the appropriate environment variables:
+
+```bash
+MODEL_ENDPOINT_URL=http://localhost:11434/v1
+```
+
+### vLLM
+
+[vLLM](https://github.com/vllm-project/vllm) is a high-performance inference engine for large language models that supports the OpenAI API format.
+
+```bash
+# Install vLLM
+pip install vllm
+
+# Run a model with OpenAI-compatible API
+python -m vllm.entrypoints.openai.api_server \
+  --model meta-llama/Llama-3-8B-Instruct \
+  --port 8000
+```
+
+Configure the Routstr proxy to connect to vLLM:
+
+```bash
+MODEL_ENDPOINT_URL=http://localhost:8000/v1
+```
+
+### LM Studio
+
+[LM Studio](https://lmstudio.ai/) provides a GUI for running models locally with an OpenAI-compatible server built-in.
+
+1. Download and install LM Studio from their website
+2. Load your chosen model
+3. Click "Start Server" to initiate the API server
+4. Connect your Routstr proxy to http://localhost:1234/v1
+
+## Commercial API Proxying
+
+You can also use Routstr to proxy requests to commercial AI providers while adding Cashu payments:
+
+### OpenAI
+
+```bash
+MODEL_ENDPOINT_URL=https://api.openai.com/v1
+OPENAI_API_KEY=your_openai_api_key
+```
+
+### Anthropic
+
+```bash
+MODEL_ENDPOINT_URL=https://api.anthropic.com/v1
+ANTHROPIC_API_KEY=your_anthropic_api_key
+```
+
+## Hardware Requirements
+
+Hardware requirements depend on the model size you're hosting:
+
+| Model Size | RAM Required | GPU VRAM | Recommended Hardware |
+|------------|--------------|----------|----------------------|
+| 7B         | 16 GB        | 8+ GB    | NVIDIA RTX 3060 or greater |
+| 13B        | 32 GB        | 16+ GB   | NVIDIA RTX 3080/4080 or greater |
+| 70B        | 64+ GB       | 40+ GB   | NVIDIA A100 (80GB) or dual GPUs |
+
+## Optimizing Model Performance
+
+To improve performance when hosting models:
+
+1. **Quantization**: Use 4-bit or 8-bit quantized models to reduce memory requirements
+2. **GPU Offloading**: Configure partial GPU offloading if you have limited VRAM
+3. **Batch Processing**: If you expect high throughput, enable batch processing
+
+## Monitoring and Management
+
+Monitor your model server's performance using tools like:
+
+1. **System monitoring**: Check GPU memory, CPU usage, and RAM utilization
+2. **Request metrics**: Track request latency, tokens per second, and concurrent requests
+3. **Error rates**: Monitor for failed inferences or timeouts
+
+## Connecting to Routstr
+
+Once your model server is running, connect it to Routstr by pointing the proxy at your model endpoint:
+
+```bash
+docker run -p 8080:8080 \
+  -e MODEL_ENDPOINT_URL=http://your-model-endpoint:8000/v1 \
+  -e OPENAI_API_KEY=your_optional_api_key \
+  ghcr.io/routstr/proxy
+```
+
+## Security Considerations
+
+When exposing your model endpoint:
+
+1. **Network security**: Only expose necessary ports
+2. **API keys**: Use proper authentication if your model server supports it
+3. **Rate limiting**: Implement appropriate rate limits to prevent abuse
+4. **TLS encryption**: Set up TLS for secure communications
+
+## Next Steps
+
+- [Provider Configuration Reference](/providers/configuration)
+- [Payment Integration](/providers/payment-integration)
+- [Advanced Provider Features](/providers/advanced-features) 

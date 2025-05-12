@@ -1,0 +1,101 @@
+---
+title: 'Models API'
+description: 'API endpoints for querying available models'
+---
+
+# Models API
+
+The Models API allows you to discover and get information about the models available through Routstr's proxy to OpenRouter.ai.
+
+## Base URL
+
+```
+https://api.routstr.com/v1/models
+```
+
+## Authentication
+
+All API requests require authentication with your Cashu token.
+
+```bash
+Authorization: Bearer YOUR_CASHU_TOKEN
+```
+
+## Endpoints
+
+### List Models
+
+```http
+GET /v1/models
+```
+
+Returns a list of models available through the Routstr platform.
+
+#### Example Request
+
+```bash
+curl -X GET https://api.routstr.com/v1/models \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN"
+```
+
+#### Example Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "gpt-4",
+      "object": "model",
+      "created": 1686935002,
+      "owned_by": "openai",
+      "permission": [],
+      "pricing": {
+        "prompt": 0.03,
+        "completion": 0.06
+      },
+      "context_length": 8192
+    },
+    {
+      "id": "claude-3-opus",
+      "object": "model",
+      "created": 1708473090,
+      "owned_by": "anthropic",
+      "permission": [],
+      "pricing": {
+        "prompt": 0.015,
+        "completion": 0.075
+      },
+      "context_length": 200000
+    },
+    {
+      "id": "llama-3-70b-chat",
+      "object": "model",
+      "created": 1714475790,
+      "owned_by": "meta",
+      "permission": [],
+      "pricing": {
+        "prompt": 0.0007,
+        "completion": 0.0014
+      },
+      "context_length": 8192
+    }
+  ]
+}
+```
+
+Since Routstr proxies to OpenRouter.ai, the available models depend on what OpenRouter.ai offers. The models listed above are examples and may not represent the current available models.
+
+## Pricing
+
+Each model has different pricing for input tokens (prompt) and output tokens (completion). The pricing is shown in dollars per 1,000 tokens. For example, GPT-4 costs $0.03 per 1,000 input tokens and $0.06 per 1,000 output tokens.
+
+## Error Handling
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Bad Request - Check your request parameters |
+| 401 | Unauthorized - Invalid Cashu token |
+| 404 | Not Found - Model not found |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Server Error - Something went wrong | 

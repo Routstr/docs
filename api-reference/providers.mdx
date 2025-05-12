@@ -1,0 +1,182 @@
+---
+title: 'Setting Up as a Provider'
+description: 'How to set up and configure the Routstr proxy for model providers'
+---
+
+# Setting Up as a Provider
+
+This guide outlines how to set up the Routstr proxy to offer AI models through the Routstr network.
+
+## Overview
+
+The Routstr proxy is a reverse proxy that sits in front of any OpenAI-compatible API endpoint to handle API key payments using Cashu tokens or Lightning invoices. As a provider, you can use this to monetize access to your AI models without setting up complex payment infrastructure.
+
+## Installation
+
+### Quick Start with Docker
+
+The fastest way to get started is using Docker:
+
+```bash
+docker run -p 8080:8080 ghcr.io/routstr/proxy
+```
+
+### Environment Configuration
+
+The proxy requires configuration through environment variables:
+
+```bash
+# Model API endpoint configuration
+MODEL_ENDPOINT_URL=https://api.openai.com/v1  # Or your self-hosted model API
+OPENAI_API_KEY=your_api_key                   # If your endpoint requires authentication
+
+# Payment settings
+CASHU_MINT_URL=https://your-mint.com
+LIGHTNING_ADDRESS=your@lightningaddress.com
+
+# Network settings
+PORT=8080                                     # Port to listen on
+```
+
+You can provide these in a `.env` file and use:
+
+```bash
+docker run -p 8080:8080 --env-file .env ghcr.io/routstr/proxy
+```
+
+### Using docker-compose
+
+For production deployments, you can use docker-compose:
+
+```yaml
+version: '3'
+services:
+  routstr-proxy:
+    image: ghcr.io/routstr/proxy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models.json:/app/models.json
+    environment:
+      - MODEL_ENDPOINT_URL=https://api.openai.com/v1
+      - OPENAI_API_KEY=your_api_key
+      - CASHU_MINT_URL=https://your-mint.com
+      - LIGHTNING_ADDRESS=your@lightningaddress.com
+    restart: unless-stopped
+```
+
+## Model Configuration
+
+Configure your models in a `models.json` file:
+
+```json
+[
+  {
+    "id": "gpt-4",
+    "pricing": {
+      "prompt": 0.03,
+      "completion": 0.06
+    },
+    "contextWindow": 8192
+  },
+  {
+    "id": "claude-3-opus",
+    "pricing": {
+      "prompt": 0.015,
+      "completion": 0.075
+    },
+    "contextWindow": 200000
+  }
+]
+```
+
+Mount this file when running the Docker container:
+
+```bash
+docker run -p 8080:8080 -v $(pwd)/models.json:/app/models.json ghcr.io/routstr/proxy
+```
+
+## Payment Integration
+
+### Cashu Integration
+
+The proxy can integrate with any Cashu mint. Set the mint URL in your environment variables:
+
+```bash
+CASHU_MINT_URL=https://8333.space:3338
+```
+
+### Lightning Integration
+
+To accept Lightning payments, set your Lightning address:
+
+```bash
+LIGHTNING_ADDRESS=you@lightningaddress.com
+```
+
+## Advanced Configuration
+
+### Custom Pricing
+
+You can set different pricing for different models:
+
+```json
+{
+  "id": "gpt-4-turbo",
+  "pricing": {
+    "prompt": 0.01,
+    "completion": 0.03
+  }
+}
+```
+
+### TLS Configuration
+
+For production deployments, configure TLS:
+
+```bash
+# Environment variables for TLS
+TLS_CERT_FILE=/path/to/cert.pem
+TLS_KEY_FILE=/path/to/key.pem
+```
+
+### Proxy & Networking
+
+For privacy-enhanced deployments, you can route through SOCKS5 or Tor:
+
+```bash
+# Route through SOCKS5
+SOCKS5_PROXY=127.0.0.1:9050
+```
+
+## Admin Dashboard
+
+The proxy includes an admin dashboard accessible at:
+
+```
+http://your-server:8080/admin
+```
+
+This dashboard provides:
+
+- Current balance and transaction history
+- Request metrics and traffic analysis
+- Model usage statistics
+- Configuration settings
+
+## Nostr Integration
+
+The proxy can announce your service on the Nostr network:
+
+```bash
+# Nostr announcement settings
+NOSTR_PRIVATE_KEY=your_nsec_or_hex_key
+NOSTR_RELAYS=wss://relay1.com,wss://relay2.com
+NOSTR_ANNOUNCEMENT_INTERVAL=3600  # Announce every hour
+```
+
+## Next Steps
+
+- [Provider Configuration Reference](/providers/configuration)
+- [Hosting Models](/providers/hosting-models)
+- [Payment Integration](/providers/payment-integration) 

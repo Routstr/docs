@@ -1,107 +1,210 @@
 ---
 title: 'Development'
-description: 'Preview changes locally to update your docs'
+description: 'Guide to developing with Routstr'
 ---
 
-<Info>
-  **Prerequisite**: Please install Node.js (version 19 or higher) before proceeding. <br />
-  Please upgrade to ```docs.json``` before proceeding and delete the legacy ```mint.json``` file.
-</Info>
+# Development Guide
 
-Follow these steps to install and run Mintlify on your operating system:
+This guide covers how to set up and develop with Routstr, whether you're building an application that uses Routstr, or contributing to Routstr itself.
 
-**Step 1**: Install Mintlify:
+## Repository Structure
 
-<CodeGroup>
+The Routstr project consists of several key components:
 
-  ```bash npm
-  npm i -g mintlify
-  ```
-
-```bash yarn
-yarn global add mintlify
+```
+/routstr
+  /proxy         - Self-hosted proxy for model providers
+  /frontend      - Web interface for the Routstr marketplace
+  /protocol      - Core protocol specifications (RIPs)
+  /docs          - Documentation site
+  /scripts       - Utility scripts and development tools
 ```
 
-</CodeGroup>
+## Development Environment
 
-**Step 2**: Navigate to the docs directory (where the `docs.json` file is located) and execute the following command:
+### Prerequisites
+
+- Node.js 19 or higher
+- Docker (for containerized development)
+- A Lightning wallet or node (for payment testing)
+- Cashu mint (optional, for token payments)
+
+### Setting Up the Proxy
 
 ```bash
-mintlify dev
+# Clone the repository
+git clone https://github.com/routstr/routstr.git
+cd routstr/proxy
+
+# Install dependencies
+npm install
+
+# Build the proxy
+npm run build
+
+# Run the proxy locally
+npm run dev
 ```
 
-A local preview of your documentation will be available at `http://localhost:3000`.
-
-### Custom Ports
-
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. To run Mintlify on port 3333, for instance, use this command:
+### Setting Up the Frontend
 
 ```bash
-mintlify dev --port 3333
+cd routstr/frontend
+
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
 ```
 
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
+## Running Tests
 
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Mintlify Versions
-
-Please note that each CLI release is associated with a specific version of Mintlify. If your local website doesn't align with the production version, please update the CLI:
-
-<CodeGroup>
-
-```bash npm
-npm i -g mintlify@latest
-```
-
-```bash yarn
-yarn global upgrade mintlify
-```
-
-</CodeGroup>
-
-## Validating Links
-
-The CLI can assist with validating reference links made in your documentation. To identify any broken links, use the following command:
+We use Jest for JavaScript/TypeScript testing:
 
 ```bash
-mintlify broken-links
+# Run proxy tests
+cd proxy
+npm test
+
+# Run frontend tests
+cd frontend
+npm test
 ```
 
-## Deployment
+## Working with the Protocol
 
-<Tip>
-  Unlimited editors available under the [Pro
-  Plan](https://mintlify.com/pricing) and above.
-</Tip>
+The Routstr Improvement Proposals (RIPs) define the standards and protocols that make up the Routstr network:
 
-If the deployment is successful, you should see the following:
+- **RIP-01**: OpenAI-API Proxy with Cashu micropayments
+- **RIP-02**: Nostr event announcements for inference nodes
+- **RIP-03**: Web interface for browsing and filtering nodes
+- **RIP-04**: Anonymous quality evaluations
+- **RIP-05**: Smart clients with Tor/proxy routing
 
-<Frame>
-  <img src="/images/checks-passed.png" style={{ borderRadius: '0.5rem' }} />
-</Frame>
+When developing for Routstr, refer to these specifications to ensure compatibility.
 
-## Code Formatting
+## Local Development Network
 
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
+For local development, you can set up a complete Routstr network locally:
+
+<Steps>
+  <Step title="Start a local Nostr relay">
+    ```bash
+    docker run -d -p 7000:7000 scsibug/nostr-rs-relay
+    ```
+  </Step>
+  <Step title="Start a local Cashu mint">
+    ```bash
+    docker run -d -p 3338:3338 cashubtc/cashu-fedibtc
+    ```
+  </Step>
+  <Step title="Configure a local proxy">
+    Create a config with the local relay and mint:
+    
+    ```json
+    {
+      "proxy": {
+        "name": "Local Provider",
+        "endpoint": "http://localhost:11434/v1"
+      },
+      "routing": {
+        "nostr": {
+          "relays": ["ws://localhost:7000"]
+        }
+      },
+      "payment": {
+        "cashu": {
+          "enabled": true,
+          "mint": "http://localhost:3338"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Run the proxy">
+    ```bash
+    docker run -p 8080:8080 -v $(pwd)/config.json:/app/config.json ghcr.io/routstr/proxy
+    ```
+  </Step>
+</Steps>
+
+## Docker Deployment
+
+For production deployment, use the official Docker image:
+
+```bash
+# Pull the latest proxy image
+docker pull ghcr.io/routstr/proxy:latest
+
+# Run the proxy with your configuration
+docker run -d -p 8080:8080 -v /path/to/config.json:/app/config.json ghcr.io/routstr/proxy
+```
+
+## Contributing to Routstr
+
+We welcome contributions to all aspects of the Routstr ecosystem:
+
+1. **Fork the repository** you want to contribute to
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add some amazing feature'`)
+4. **Push to the branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
+
+### Coding Standards
+
+- We use TypeScript for type safety
+- Follow the existing code style and include tests
+- Documentation is required for new features
+
+## Building and Deploying
+
+### Building the Proxy
+
+```bash
+cd proxy
+npm run build
+```
+
+The built package will be in the `dist` directory.
+
+### Building the Frontend
+
+```bash
+cd frontend
+npm run build
+```
+
+The built site will be in the `out` directory.
 
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
-
-    This may be due to an outdated version of node. Try the following:
-    1. Remove the currently-installed version of mintlify: `npm remove -g mintlify`
-    2. Upgrade to Node v19 or higher.
-    3. Reinstall mintlify: `npm install -g mintlify`
+  <Accordion title="Proxy connection issues">
+    If the proxy cannot connect to providers:
+    
+    1. Check that your Nostr relays are accessible
+    2. Verify that your proxy is properly announced to the network
+    3. Ensure your local network allows the connections
   </Accordion>
-
-  <Accordion title="Issue: Encountering an unknown error">
-  
-    Solution: Go to the root of your device and delete the \~/.mintlify folder. Afterwards, run `mintlify dev` again.
+  <Accordion title="Provider not receiving requests">
+    If your provider isn't receiving requests:
+    
+    1. Verify it's properly announced to the network
+    2. Check that your API endpoint is accessible
+    3. Look at the proxy logs for errors
+  </Accordion>
+  <Accordion title="Payment problems">
+    For payment issues:
+    
+    1. Test your Lightning or Cashu setup independently
+    2. Verify the payment flow using the debugging tools
+    3. Check logs for payment-related errors
   </Accordion>
 </AccordionGroup>
 
-Curious about what changed in the CLI version? [Check out the CLI changelog.](https://www.npmjs.com/package/mintlify?activeTab=versions)
+## Additional Resources
+
+- [GitHub Repository](https://github.com/routstr/routstr)
+- [Community Forum](https://t.me/routstr_community)
+- [API Reference](/api-reference/introduction)

@@ -1,71 +1,61 @@
 ---
-title: Introduction
-description: "Welcome to the home of your new documentation"
+title: Introduction to Routstr
+description: "A decentralized LLM routing marketplace powered by Nostr and Bitcoin"
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.png"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Hero Dark"
-/>
+<img src="/images/hero.png" className="block dark:hidden" alt="Routstr Logo" />
+<img src="/images/hero.png" className="hidden dark:block" alt="Routstr Logo" />
 
-## Setting up
+## Welcome to Routstr
 
-The first step to world-class documentation is setting up your editing environments.
+Routstr is a decentralized LLM (Large Language Model) routing marketplace that brings the convenience of centralized AI providers to the permissionless, censorship-resistant world of Nostr and Bitcoin. It enables seamless access to AI models through a unified interface while maintaining privacy, reducing costs, and eliminating traditional payment barriers.
+
+## Core Features
 
 <CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
+  <Card title="Smart Client SDK" icon="wand-magic-sparkles">
+    One intelligent client that automatically finds the cheapest, fastest model for every prompt
   </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
+  <Card title="Self-Hosted Proxy" icon="server">
+    Turn any OpenAI-compatible endpoint into a pay-as-you-go business without Stripe or KYC requirements
+  </Card>
+  <Card title="Privacy Routing" icon="shield-halved">
+    Built-in SOCKS5 and Tor support for enhanced privacy and censorship resistance
+  </Card>
+  <Card title="Decentralized Payments" icon="bitcoin-sign">
+    Cashu ecash tokens and BOLT12 Lightning invoices for prepaid, private transactions
   </Card>
 </CardGroup>
 
-## Make it yours
+## How Routstr Works
 
-Update your docs to your brand and add valuable content for the best user conversion.
+Routstr creates a decentralized marketplace where:
+
+1. **AI Model Providers** can offer their inference services and receive micropayments without complex payment infrastructure
+2. **End Users** can access a wide range of AI models through a single, unified API with automatic routing to the best available option
+
+This approach combines the best of both worlds: the convenience of centralized services with the freedom and privacy of decentralized networks.
+
+## Documentation Overview
+
+This documentation is organized into two main sections:
 
 <CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
+  <Card title="For Users" icon="user" href="/users/getting-started">
+    How to use Routstr to access AI models for your applications, with guides for developers and end-users
   </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/content/components/accordions"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
+  <Card title="For Providers" icon="server" href="/providers/getting-started">
+    How to offer your AI models through Routstr and receive micropayments for inference services
   </Card>
 </CardGroup>
+
+## Current Status
+
+Routstr is actively being developed according to the following roadmap:
+
+1. **RIP-01**: OpenAI-API Proxy with Cashu micropayments for LLM inference
+2. **RIP-02**: Nostr event announcements for inference nodes and capabilities
+3. **RIP-03**: Web interface for browsing and filtering available nodes
+4. **RIP-04 & RIP-05**: Anonymous evaluations and smart clients with Tor/proxy routing
+
+To get started quickly, head to the [Quickstart Guide](/quickstart).

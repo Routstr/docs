@@ -1,33 +1,71 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Routstr API Reference Documentation'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+# Routstr API Reference
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+Welcome to the Routstr API documentation. Our API enables you to access AI models through a proxy service to OpenRouter.ai, with integrated wallet functionality for payments using Cashu tokens.
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests require authentication using bearer tokens. These tokens are Cashu tokens which contain pre-paid credits.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Hello"
+      }
+    ]
+  }'
+```
+
+## API Compatibility
+
+<Note>
+Our API is a 1:1 proxy to OpenRouter.ai, which itself is compatible with OpenAI's API format, making it easy to switch between providers.
+</Note>
+
+## API Endpoints
+
+The Routstr API consists of several core endpoints:
+
+### Core Endpoints
+
+- **Proxy Endpoints** (`/{path}`): All HTTP methods (GET, POST, PUT, DELETE, etc.) are supported for proxying requests to the underlying OpenRouter.ai API.
+
+### Wallet Endpoints
+
+- **Account Info** (`/v1/wallet/`): Get information about your account and remaining balance.
+- **Topup Balance** (`/v1/wallet/topup`): Add funds to your account using Cashu tokens.
+- **Refund Balance** (`/v1/wallet/refund`): Withdraw your remaining balance as a Cashu token.
+
+## Example: Account Information
+
+```bash
+curl -X GET https://api.routstr.com/v1/wallet/ \
+  -H "Authorization: Bearer YOUR_CASHU_TOKEN"
+```
+
+## Example: Adding Funds to Your Account
+
+```bash
+curl -X POST https://api.routstr.com/v1/wallet/topup?cashu_token=YOUR_NEW_CASHU_TOKEN \
+  -H "Authorization: Bearer YOUR_EXISTING_CASHU_TOKEN"
+```
+
+## OpenAPI Specification
+
+For developers who prefer to use the OpenAPI specification, you can access our OpenAPI document [here](/api-reference/openapi.json).
+
+```yaml
+import ApiDocMdx from './openapi.json';
+
+<ApiDocMdx />;
 ```

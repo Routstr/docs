@@ -1,0 +1,416 @@
+---
+title: 'Building Applications'
+description: 'Guide to building applications with the Routstr API'
+---
+
+# Building Applications with Routstr
+
+This guide provides examples and best practices for integrating the Routstr API into your applications, whether you're building a web app, mobile app, or backend service.
+
+## Application Architecture
+
+When integrating Routstr, consider these common architecture patterns:
+
+### Frontend Integration
+
+For web and mobile applications, you can integrate Routstr's API directly in the frontend:
+
+```javascript
+// React component example
+function AIAssistant() {
+  const [message, setMessage] = useState('');
+  const [response, setResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const result = await fetch('https://api.routstr.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer cashuA1DkpMbgQ9VkL6U...'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'user', content: message }
+          ]
+        })
+      });
+      
+      const data = await result.json();
+      setResponse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Ask anything..."
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Send'}
+        </button>
+      </form>
+      
+      {response && (
+        <div className="response">
+          {response}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Using the OpenAI Client Library
+
+Since Routstr's API is compatible with the OpenAI format, you can use the OpenAI client library:
+
+```javascript
+// React component using OpenAI SDK
+import { useState } from 'react';
+import OpenAI from 'openai';
+
+function AIAssistant() {
+  const [message, setMessage] = useState('');
+  const [response, setResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Initialize OpenAI client with Routstr endpoint
+  const openai = new OpenAI({
+    baseURL: 'https://api.routstr.com/v1',
+    apiKey: 'cashuA1DkpMbgQ9VkL6U...',
+    dangerouslyAllowBrowser: true // For frontend use (consider backend proxy for production)
+  });
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const result = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          { role: 'user', content: message }
+        ]
+      });
+      
+      setResponse(result.choices[0].message.content);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Ask anything..."
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Send'}
+        </button>
+      </form>
+      
+      {response && (
+        <div className="response">
+          {response}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Backend Integration
+
+For more complex applications, you may want to integrate Routstr in your backend:
+
+```javascript
+// Express.js example
+import express from 'express';
+import axios from 'axios';
+
+const app = express();
+app.use(express.json());
+
+// Store Cashu token in environment variable
+const ROUTSTR_AUTH_TOKEN = process.env.ROUTSTR_AUTH_TOKEN;
+
+app.post('/api/generate', async (req, res) => {
+  try {
+    const { prompt, options } = req.body;
+    
+    const response = await axios.post('https://api.routstr.com/v1/chat/completions', {
+      model: options?.model || 'gpt-4',
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+      temperature: options?.temperature || 0.7,
+      max_tokens: options?.max_tokens || 200
+    }, {
+      headers: {
+        'Authorization': `Bearer ${ROUTSTR_AUTH_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    res.json({
+      text: response.data.choices[0].message.content,
+      usage: response.data.usage
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+## Streaming Responses
+
+For real-time responses in your UI:
+
+```javascript
+// React example with streaming using fetch API
+function StreamingAI() {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsStreaming(true);
+    setResponse('');
+    
+    try {
+      const result = await fetch('https://api.routstr.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer cashuA1DkpMbgQ9VkL6U...'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          stream: true
+        })
+      });
+      
+      const reader = result.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        // Process the received chunk
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n").filter(line => line.trim() !== "");
+        
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") continue;
+            
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices[0]?.delta?.content || '';
+              if (content) {
+                setResponse(prev => prev + content);
+              }
+            } catch (error) {
+              console.error("Error parsing JSON:", error);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsStreaming(false);
+    }
+  };
+  
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input 
+          value={prompt} 
+          onChange={(e) => setPrompt(e.target.value)} 
+        />
+        <button type="submit" disabled={isStreaming}>
+          Ask
+        </button>
+      </form>
+      
+      <div className="stream-response">
+        {response || 'Waiting for your question...'}
+        {isStreaming && <span className="cursor">|</span>}
+      </div>
+    </div>
+  );
+}
+```
+
+## Multi-Model Applications
+
+For applications that need different models for different tasks:
+
+```javascript
+// Content generation service using multiple models
+class ContentService {
+  constructor(authToken) {
+    this.authToken = authToken;
+    this.apiUrl = 'https://api.routstr.com/v1/chat/completions';
+  }
+  
+  async makeRequest(model, messages, options = {}) {
+    const response = await fetch(this.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.authToken}`
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        ...options
+      })
+    });
+    
+    return response.json();
+  }
+  
+  async generateBlogPost(topic) {
+    // Use high-quality model for creative writing
+    const result = await this.makeRequest(
+      'claude-3-opus',
+      [{ role: 'user', content: `Write a blog post about ${topic}` }],
+      { temperature: 0.8 }
+    );
+    
+    return result.choices[0].message.content;
+  }
+  
+  async summarizeText(text) {
+    // Use efficient model for summarization
+    const result = await this.makeRequest(
+      'llama-3-8b-instruct',
+      [{ role: 'user', content: `Summarize the following text: ${text}` }],
+      { 
+        temperature: 0.3,
+        max_tokens: 100
+      }
+    );
+    
+    return result.choices[0].message.content;
+  }
+  
+  async analyzeImage(imageUrl) {
+    // Use model with vision capabilities
+    const result = await this.makeRequest(
+      'gpt-4-vision',
+      [{ 
+        role: 'user', 
+        content: [
+          { type: 'text', text: 'What is in this image?' },
+          {
+            type: 'image_url',
+            image_url: { url: imageUrl }
+          }
+        ]
+      }]
+    );
+    
+    return result.choices[0].message.content;
+  }
+}
+```
+
+## Handling Errors
+
+Implement robust error handling in your application:
+
+```javascript
+async function callRoutstrAPI(prompt) {
+  try {
+    const response = await fetch('https://api.routstr.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer cashuA1DkpMbgQ9VkL6U...'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      
+      // Handle different error types
+      if (response.status === 429) {
+        // Rate limiting error
+        console.error('Rate limit exceeded. Please try again later.');
+        return { error: 'rate_limited', retryAfter: response.headers.get('retry-after') };
+      } else if (response.status === 402) {
+        // Payment required
+        console.error('Insufficient funds or payment required');
+        return { error: 'payment_required' };
+      } else {
+        // Other API errors
+        console.error(`API error: ${errorData.error?.message || 'Unknown error'}`);
+        return { error: 'api_error', details: errorData };
+      }
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    // Network or other client-side errors
+    console.error('Network error:', error);
+    return { error: 'network_error', message: error.message };
+  }
+}
+```
+
+## Deployment Considerations
+
+When deploying Routstr-integrated applications:
+
+1. **Environment Variables**: Store authentication tokens securely
+2. **Rate Limiting**: Implement application-level rate limiting to prevent abuse
+3. **Fallbacks**: Consider fallback strategies when providers are unavailable
+4. **Monitoring**: Track usage, costs, and performance metrics
+5. **Caching**: Cache common responses to reduce costs and improve performance
+6. **Security**: Consider implementing a backend proxy to avoid exposing your Cashu tokens in frontend code
+
+## Next Steps
+
+- [Advanced API Usage](/users/advanced-sdk)
+- [Model Selection](/users/model-selection)
+- [Privacy Features](/users/privacy) 

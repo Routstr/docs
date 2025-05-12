@@ -1,0 +1,200 @@
+---
+title: 'Model Selection Criteria'
+description: 'How to select the optimal AI model for your Routstr requests'
+---
+
+# Model Selection in Routstr
+
+When using Routstr's API, you have several options for selecting which AI model to use for your requests. This guide explains the available options and best practices.
+
+## Specifying a Model
+
+You can directly specify which model to use in your API requests:
+
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Explain quantum computing"
+      }
+    ]
+  }'
+```
+
+Common model options include:
+- `gpt-4` - OpenAI's GPT-4 model
+- `llama-3-70b-chat` - Meta's Llama 3 (70B parameter) chat model
+- `claude-3-opus` - Anthropic's Claude 3 Opus model
+
+## Using the Default Route
+
+If you don't specify a model, Routstr will route your request to an appropriate model based on your request content and model availability:
+
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Explain quantum computing"
+      }
+    ]
+  }'
+```
+
+The default routing considers:
+1. **Availability**: Which models are currently accessible and responding quickly
+2. **Cost**: Models with lower token prices may be preferred
+3. **Capability**: The complexity of your request may route to more powerful models
+
+## Choosing Models Based on Capabilities
+
+Different models have different capabilities. For specialized tasks, use the appropriate model:
+
+### For Text Generation
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "llama-3-8b-chat",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Write a short poem about autumn"
+      }
+    ]
+  }'
+```
+
+### For Code Generation
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Write a Python function to calculate Fibonacci numbers"
+      }
+    ]
+  }'
+```
+
+### For Image Understanding (Vision)
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4-vision",
+    "messages": [
+      {
+        "role": "user", 
+        "content": [
+          {
+            "type": "text",
+            "text": "What's in this image?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://example.com/image.jpg"
+            }
+          }
+        ]
+      }
+    ]
+  }'
+```
+
+## Model Parameters
+
+You can customize how a model generates responses by adjusting parameters:
+
+```bash
+curl -X POST https://api.routstr.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+  -d '{
+    "model": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 500,
+    "top_p": 0.95,
+    "messages": [
+      {
+        "role": "user", 
+        "content": "Explain quantum computing"
+      }
+    ]
+  }'
+```
+
+Common parameters include:
+- `temperature`: Controls randomness (0.0 to 1.0, lower is more deterministic)
+- `max_tokens`: Maximum length of the generated response
+- `top_p`: Nucleus sampling parameter (0.0 to 1.0)
+- `top_k`: Limits vocabulary to top k options (only for some models)
+- `presence_penalty`: Reduces repetition of previously mentioned topics
+- `frequency_penalty`: Reduces repetition of frequently used tokens
+
+## Model Pricing
+
+Different models have different pricing per token:
+
+| Model | Input Price (per 1K tokens) | Output Price (per 1K tokens) |
+|-------|-----------------------------|-----------------------------|
+| gpt-3.5-turbo | $0.0005 | $0.0015 |
+| gpt-4 | $0.03 | $0.06 |
+| claude-3-opus | $0.015 | $0.075 |
+| llama-3-70b | $0.0007 | $0.0014 |
+
+Consider the balance between model capability and price for your use case.
+
+## Using the Python OpenAI Client
+
+If you're using Python, you can use the OpenAI client to select models:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.routstr.com/v1",
+    api_key="cashuA1DkpMbgQ9VkL6U..."
+)
+
+# Specify a model
+completion = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "Write a short story"}
+    ],
+    temperature=0.7,
+    max_tokens=2000
+)
+
+print(completion.choices[0].message.content)
+```
+
+## Best Practices
+
+1. **Start with a general-purpose model** like `gpt-3.5-turbo` for basic tasks
+2. **Upgrade to more powerful models** for complex reasoning or specialized tasks
+3. **Use vision models** when working with images
+4. **Balance cost and capability** - only use expensive models when needed
+5. **Be specific in your prompts** about quality and format requirements
+
+## Next Steps
+
+- [API Reference](/api-reference/introduction)
+- [Privacy Features](/users/privacy)
+- [Building Applications with Routstr](/users/applications) 
