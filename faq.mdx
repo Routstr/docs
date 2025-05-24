@@ -1,0 +1,39 @@
+---
+title: Frequently Asked Questions
+description: "Frequently asked questions about Routstr"
+---
+
+## General Questions
+
+### What is Routstr?
+Routstr is a decentralized LLM routing marketplace that brings the convenience of centralized AI providers to the permissionless, censorship-resistant world of Nostr and Bitcoin.
+
+### How does Routstr work?
+Routstr creates a decentralized marketplace where AI model providers can offer their inference services and receive micropayments without complex payment infrastructure, and end users can access a wide range of AI models through a single, unified API with automatic routing to the best available option.
+
+## Privacy Questions
+
+### What privacy features does Routstr offer to its users? 
+Routstr offers accountless LLM querying and prevents traceability via payments as we only accept payments via Cashu ecash. It also enables users to break the linkage between their identities by allowing them to pay per query.
+
+### Does Routstr log user queries or IP addresses? 
+Routstr protocol is open-source, you can check the code [here](https://github.com/Routstr/protocol). We do not log any user queries or IP addresses. But honestly, you'd be trusting us here. There's no way to verify this yet. We are looking for ways to allow you to verify.
+
+### Does Routstr guarantee that the LLM API providers are not logging user queries? 
+No. It is technically not possible for us to offer such guarantees as we do not have a way to perform LLM inference privately using GPUs yet (if you know how, please let us know). Routstr allows for identity compartmentalization and not private querying. The only way to interact with an AI with 100% privacy is by [hosting locally](/providers/hosting-models).
+
+### What are the best practices to use Routstr privately? 
+1. Always be behind a VPN or Tor. Then you won't need to trust us that we are not logging your IP addresses.
+2. Do not reveal information you don't need to in the API queries to prevent LLM hosting providers (or even us) from misusing it or tracing it back to you.
+3. Compartmentalize your identities while using Routstr. Make sure to switch your IP address (on VPN/Tor) and your Cashu token when you're switching identities.
+
+## Technical Questions
+
+### Who is hosting the LLM models I can access through Routstr?
+Anyone can host the LLM models to offer it through Routstr for Sats in return. Currently, Routstr has a 1-1 integration with OpenRouter. If you'd like to be a provider, check out our docs for [providers](/providers/getting-started).
+
+### What is the technology stack used by Routstr?
+Routstr is built leveraging Cashu ecash, Nostr and Bitcoin. All of the frontends you are using to interact with Routstr are [open-source](https://github.com/Routstr).
+
+### How do I integrate Routstr with my application?
+To integrate Routstr with your application, you can use the Routstr API, which provides a unified interface for accessing AI models. You can find more information about the API in the [API Reference](/api-reference).
