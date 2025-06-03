@@ -32,7 +32,8 @@
               "users/advanced-sdk",
               "users/model-selection",
               "users/privacy",
-              "users/applications"
+              "users/applications",
+              "users/tor-usage"
             ]
           }
         ]
