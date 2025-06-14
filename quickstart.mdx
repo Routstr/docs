@@ -71,23 +71,18 @@ This quickstart guide will help you integrate Routstr into your application quic
     ```
   </Step>
   <Step title="Connect payments">
-    Configure your Cashu mint or Lightning node to accept pre-paid tokens. No need for Stripe or KYC:
-    
+    Configure your Cashu mint or Lightning node using environment variables. Create a `.env` file with your payment settings:
+
     ```bash
-    # Edit the proxy configuration file
-    nano config.json
-    
-    # Add your payment configuration
-    {
-      "payments": {
-        "lightning": {
-          "address": "your@lightning.address"
-        },
-        "cashu": {
-          "enabled": true
-        }
-      }
-    }
+    # Payment configuration
+    LIGHTNING_ADDRESS=your@lightning.address
+    CASHU_MINT_URL=https://your-cashu-mint.com
+    MINIMUM_PAYOUT=100
+    ```
+    Then run the proxy with your `.env` file:
+
+    ```bash
+    docker run -p 8080:8080 --env-file .env ghcr.io/routstr/proxy
     ```
   </Step>
   <Step title="Monitor and scale">
