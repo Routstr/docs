@@ -116,7 +116,7 @@ Monitor your model server's performance using tools like:
 Once your model server is running, connect it to Routstr by pointing the proxy at your model endpoint:
 
 ```bash
-docker run -p 8080:8080 \
+docker run -p 8000:8000 \
   -e MODEL_ENDPOINT_URL=http://your-model-endpoint:8000/v1 \
   -e OPENAI_API_KEY=your_optional_api_key \
   ghcr.io/routstr/proxy

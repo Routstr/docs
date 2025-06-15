@@ -97,8 +97,8 @@ For maximum privacy, you can:
 
 ```bash
 # Run your own Routstr proxy
-docker run -p 8080:8080 \
-  -v /path/to/config.json:/app/config.json \
+docker run -p 8000:8000 \
+  --env-file .env \
   ghcr.io/routstr/proxy
 ```
 

@@ -100,31 +100,19 @@ For local development, you can set up a complete Routstr network locally:
     ```
   </Step>
   <Step title="Configure a local proxy">
-    Create a config with the local relay and mint:
-    
-    ```json
-    {
-      "proxy": {
-        "name": "Local Provider",
-        "endpoint": "http://localhost:11434/v1"
-      },
-      "routing": {
-        "nostr": {
-          "relays": ["ws://localhost:7000"]
-        }
-      },
-      "payment": {
-        "cashu": {
-          "enabled": true,
-          "mint": "http://localhost:3338"
-        }
-      }
-    }
+    Create a `.env` file pointing to your local relay and mint. At minimum set an
+    NSEC for wallet generation:
+
+    ```bash
+    NSEC=your_local_nsec
+    MODEL_ENDPOINT_URL=http://localhost:11434/v1
+    CASHU_MINT_URL=http://localhost:3338
+    ROUTSTR_RELAY=ws://localhost:7000
     ```
   </Step>
   <Step title="Run the proxy">
     ```bash
-    docker run -p 8080:8080 -v $(pwd)/config.json:/app/config.json ghcr.io/routstr/proxy
+    docker run -p 8000:8000 --env-file .env ghcr.io/routstr/proxy
     ```
   </Step>
 </Steps>
@@ -138,7 +126,7 @@ For production deployment, use the official Docker image:
 docker pull ghcr.io/routstr/proxy:latest
 
 # Run the proxy with your configuration
-docker run -d -p 8080:8080 -v /path/to/config.json:/app/config.json ghcr.io/routstr/proxy
+docker run -d -p 8000:8000 --env-file .env ghcr.io/routstr/proxy
 ```
 
 ## Contributing to Routstr

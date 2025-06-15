@@ -67,27 +67,22 @@ This quickstart guide will help you integrate Routstr into your application quic
     Deploy our self-hosted proxy in front of any OpenAI-compatible endpoint with a simple Docker command:
     
     ```bash
-    docker run -p 8080:8080 ghcr.io/routstr/proxy
+    docker run -p 8000:8000 ghcr.io/routstr/proxy
     ```
   </Step>
   <Step title="Connect payments">
-    Configure your Cashu mint or Lightning node to accept pre-paid tokens. No need for Stripe or KYC:
-    
+    Configure your Cashu mint or Lightning node using environment variables:
+
     ```bash
-    # Edit the proxy configuration file
-    nano config.json
-    
-    # Add your payment configuration
-    {
-      "payments": {
-        "lightning": {
-          "address": "your@lightning.address"
-        },
-        "cashu": {
-          "enabled": true
-        }
-      }
-    }
+    # .env file example
+    NSEC=your_nostr_secret_key
+    RECEIVE_LN_ADDRESS=your@lightning.address
+    ```
+
+    Then run the proxy with:
+
+    ```bash
+    docker run -p 8000:8000 --env-file .env ghcr.io/routstr/proxy
     ```
   </Step>
   <Step title="Monitor and scale">
