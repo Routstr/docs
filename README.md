@@ -19,7 +19,7 @@ Routstr brings the convenience of centralized AI providers to the permissionless
 
 Access AI models through Routstr by:
 
-1. Obtaining Cashu tokens with Lightning or on-chain Bitcoin
+1. Minting Cashu tokens using your wallet via Lightning or on-chain Bitcoin, for example through [chat.routstr.com](https://chat.routstr.com) or any Cashu wallet
 2. Using the token in API requests to `https://api.routstr.com/v1/chat/completions`
 3. Making requests with your preferred OpenAI-compatible client library
 
