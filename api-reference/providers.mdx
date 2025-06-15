@@ -18,7 +18,7 @@ The Routstr proxy is a reverse proxy that sits in front of any OpenAI-compatible
 The fastest way to get started is using Docker:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/routstr/proxy
+docker run -p 8000:8000 ghcr.io/routstr/proxy
 ```
 
 ### Environment Configuration
@@ -35,13 +35,13 @@ CASHU_MINT_URL=https://your-mint.com
 LIGHTNING_ADDRESS=your@lightningaddress.com
 
 # Network settings
-PORT=8080                                     # Port to listen on
+PORT=8000                                     # Port to listen on
 ```
 
 You can provide these in a `.env` file and use:
 
 ```bash
-docker run -p 8080:8080 --env-file .env ghcr.io/routstr/proxy
+docker run -p 8000:8000 --env-file .env ghcr.io/routstr/proxy
 ```
 
 ### Using docker-compose
@@ -54,7 +54,7 @@ services:
   routstr-proxy:
     image: ghcr.io/routstr/proxy
     ports:
-      - "8080:8080"
+      - "8000:8000"
     volumes:
       - ./models.json:/app/models.json
     environment:
@@ -93,7 +93,7 @@ Configure your models in a `models.json` file:
 Mount this file when running the Docker container:
 
 ```bash
-docker run -p 8080:8080 -v $(pwd)/models.json:/app/models.json ghcr.io/routstr/proxy
+docker run -p 8000:8000 -v $(pwd)/models.json:/app/models.json ghcr.io/routstr/proxy
 ```
 
 ## Payment Integration
@@ -154,7 +154,7 @@ SOCKS5_PROXY=127.0.0.1:9050
 The proxy includes an admin dashboard accessible at:
 
 ```
-http://your-server:8080/admin
+http://your-server:8000/admin
 ```
 
 This dashboard provides:

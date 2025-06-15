@@ -38,29 +38,25 @@ Joining Routstr as a provider gives you:
 The simplest way to set up a Routstr provider is using the official Docker image:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/routstr/proxy
+docker run -p 8000:8000 ghcr.io/routstr/proxy
 ```
 
 This will start a proxy server that can accept Cashu token payments and forward requests to your OpenAI-compatible API endpoint.
 
 ### Configuration
 
-The proxy requires configuration to connect to your model endpoint and set up payments. You can create a `.env` file with the following settings:
+The proxy uses environment variables for configuration. At minimum provide an `NSEC` for wallet generation. Additional variables can be set as needed:
 
 ```bash
-# API endpoint settings
-OPENAI_API_KEY=your_model_api_key
+NSEC=your_nostr_secret_key
 MODEL_ENDPOINT_URL=http://your-model-endpoint:8000/v1
-
-# Payment settings
-CASHU_MINT_URL=https://your-cashu-mint.com
-LIGHTNING_ADDRESS=your@lightning.address
+OPENAI_API_KEY=your_model_api_key
 ```
 
 Then run the Docker container with your configuration:
 
 ```bash
-docker run -p 8080:8080 \
+docker run -p 8000:8000 \
   --env-file .env \
   ghcr.io/routstr/proxy
 ```
@@ -113,7 +109,7 @@ You can monitor your provider using the built-in dashboard:
 
 ```bash
 # Access the dashboard
-open http://localhost:8080/admin
+open http://localhost:8000/admin
 ```
 
 The dashboard provides information about:
