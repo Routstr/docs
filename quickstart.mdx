@@ -21,32 +21,17 @@ This quickstart guide will help you integrate Routstr into your application quic
 ## For Users: Quick Integration
 
 <Steps>
-  <Step title="Buy Cashu tokens">
-    Purchase AI credits directly with Lightning or on-chain Bitcoin:
-    
-    ```bash
-    # Visit the Routstr token purchase page
-    https://routstr.com/tokens
-    ```
-    
-    No account or sign-up required. Simply make a Lightning payment to receive your token.
-  </Step>
-  <Step title="Receive token instantly">
-    After payment, you'll receive a Cashu token to use as your API authorization key:
-    
-    ```
-    ROUTSTR_TOKEN=cashuA1DkpMbgQ9VkL6U...
-    ```
-    
-    This token contains pre-paid credits for API usage.
+  <Step title="Get a Cashu token">
+    You can mint tokens in the settings of our web app at [chat.routstr.com](https://chat.routstr.com).
+    Alternatively, generate a token using any Cashu wallet such as [cashu.me](https://cashu.me) or [minibits.cash](https://minibits.cash).
   </Step>
   <Step title="Make API calls directly">
-    Use the token in your API calls with our OpenAI-compatible endpoint:
+    Use your token in API calls with our OpenAI-compatible endpoint:
     
     ```bash
     curl -X POST https://api.routstr.com/v1/chat/completions \
       -H "Content-Type: application/json" \
-      -H "Authorization: Bearer cashuA1DkpMbgQ9VkL6U..." \
+      -H "Authorization: Bearer <your Cashu token>" \
       -d '{
         "model": "gpt-4",
         "messages": [
@@ -85,15 +70,15 @@ This quickstart guide will help you integrate Routstr into your application quic
     docker run -p 8000:8000 --env-file .env ghcr.io/routstr/proxy
     ```
   </Step>
-  <Step title="Monitor and scale">
+  <Step title="Monitor and scale (coming soon)">
     Track usage, set custom pricing, and join the relay network to get discovered by users automatically:
-    
+
     ```bash
     # Announce your provider to the Nostr network
-    routstr-proxy announce --name "Your Provider" --models "gpt-4,llama-3"
-    
+    routstr announce --name "Your Provider" --models "gpt-4,llama-3"
+
     # Monitor usage statistics
-    routstr-proxy stats
+    routstr stats
     ```
   </Step>
 </Steps>
